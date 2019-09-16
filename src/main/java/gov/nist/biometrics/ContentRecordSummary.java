@@ -2,6 +2,7 @@
 package gov.nist.biometrics;
 
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -14,7 +15,6 @@ import org.w3c.dom.NodeList;
  */
 public class ContentRecordSummary {
 
-    
     private String imageReferenceID = null;
     private String recordCategoryCode = null;
 
@@ -74,6 +74,22 @@ public class ContentRecordSummary {
         return false;
     }
     
+    Element toXml(Document doc) {
+        
+        Element crs = doc.createElementNS("http://biometrics.nist.gov/standard/2011", "ContentRecordSummary");
+        Element id = doc.createElementNS("http://publication.niem.gov/niem/domains/biometrics/4.0/1/", "ImageReferenceID");
+        Element code = doc.createElementNS("http://biometrics.nist.gov/standard/2011", "RecordCategoryCode");
+        crs.setPrefix("itl");
+        id.setPrefix("biom");
+        code.setPrefix("itl");
+        id.setTextContent(this.getImageReferenceID());
+        code.setTextContent(this.getRecordCategoryCode());
+        crs.appendChild(id);
+        crs.appendChild(code);
+        
+        return crs;
+    }
+    
     static ContentRecordSummary convertRecordToCRS(Element record) {
         ContentRecordSummary crs = new ContentRecordSummary();
         
@@ -93,7 +109,7 @@ public class ContentRecordSummary {
             (recordName.endsWith("UserDefinedTestingImageRecord")) crs.setRecordCategoryCode("16"); else if
             (recordName.endsWith("PackageIrisImageRecord")) crs.setRecordCategoryCode("17"); else if
             (recordName.endsWith("PackageDNARecord")) crs.setRecordCategoryCode("18"); else if
-            (recordName.endsWith("PackagePlantarImageRecord>")) crs.setRecordCategoryCode("19"); else if
+            (recordName.endsWith("PackagePlantarImageRecord")) crs.setRecordCategoryCode("19"); else if
             (recordName.endsWith("PackageSourceRepresentationRecord")) crs.setRecordCategoryCode("20"); else if
             (recordName.endsWith("PackageAssociatedContextRecord")) crs.setRecordCategoryCode("21"); else if
             (recordName.endsWith("PackageNonPhotographicImageryRecord")) crs.setRecordCategoryCode("22"); else if
@@ -105,9 +121,10 @@ public class ContentRecordSummary {
         for(int i = 0; i < children.getLength(); i++) {
             if(children.item(i).getNodeName().endsWith("ImageReferenceID")) {
                 Node id = children.item(i);
-                System.out.println("text content" + id.getTextContent());
                 Element idElement = (Element) id;            
-                String idValue = idElement.getNodeValue();
+                String idValue = idElement.getTextContent();
+                
+                System.out.println("ID = " + idValue);
                 crs.setImageReferenceID(idValue);
                     
             }
