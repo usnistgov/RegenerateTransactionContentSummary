@@ -27,7 +27,8 @@ public class RegenerateTransactionContentSummary {
 
     public static void run() throws ParserConfigurationException, SAXException, IOException {
 
-        String filename = "/home/mccaffrey/biometrics/401/xml/AllFields401.xml";
+        //String filename = "/home/mccaffrey/biometrics/401/xml/AllFields401.xml";
+        String filename = "/home/mccaffrey/biometrics/SomeFieldsTransformed20190917.xml";
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(new File(filename));
