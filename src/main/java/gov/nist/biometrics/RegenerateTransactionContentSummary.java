@@ -25,10 +25,10 @@ import org.xml.sax.SAXException;
  */
 public class RegenerateTransactionContentSummary {
 
-    public static void run() throws ParserConfigurationException, SAXException, IOException {
+    public static void run(String filename) throws ParserConfigurationException, SAXException, IOException {
 
         //String filename = "/home/mccaffrey/biometrics/401/xml/AllFields401.xml";
-        String filename = "/home/mccaffrey/biometrics/SomeFieldsTransformed20190917.xml";
+        //String filename = "/home/mccaffrey/biometrics/SomeFieldsTransformed20190917.xml";
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(new File(filename));
@@ -121,6 +121,7 @@ public class RegenerateTransactionContentSummary {
 
     
     public static final void main(String [] args) throws ParserConfigurationException, IOException, SAXException {
-        RegenerateTransactionContentSummary.run();
+        String filename = args[0];
+        RegenerateTransactionContentSummary.run(filename);
     }
 }
