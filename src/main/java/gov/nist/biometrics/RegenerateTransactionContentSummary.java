@@ -78,10 +78,6 @@ public class RegenerateTransactionContentSummary {
             }
         }
 
-        System.out.println("transaction name = " + transactionContentSummary.getTagName());
-
-        System.out.println(xmlToString(contentRecordSummarys.get(0).toXml(doc)));
-
         NodeList tcsChildren = transactionContentSummary.getChildNodes();
         for (int i = 0; i < tcsChildren.getLength(); i++) {
             if (tcsChildren.item(i) instanceof Element) {
@@ -98,10 +94,10 @@ public class RegenerateTransactionContentSummary {
             transactionContentSummary.appendChild(crsElement);
 
         }
-System.out.println(outputFilename + "output???");
-        //  System.out.println(xmlToString(doc));
-        if(outputFilename == null || outputFilename.isEmpty())
+
+        if (outputFilename == null || outputFilename.isEmpty()) {
             outputFilename = generateCurrentFilename();
+        }
         FileUtils.writeStringToFile(new File(outputFilename), xmlToString(doc), Charset.defaultCharset());
         //   /itl:NISTBiometricInformationExchangePackage/itl:PackageInformationRecord[1]/itl:Transaction[1]/itl:TransactionContentSummary[1]
 
@@ -110,9 +106,9 @@ System.out.println(outputFilename + "output???");
     public static String generateCurrentFilename() {
         StringBuilder sb = new StringBuilder();
         sb.append("output");
-   
+
         Calendar now = Calendar.getInstance();
-        
+
         sb.append(now.get(Calendar.YEAR));
         sb.append(now.get(Calendar.MONTH));
         sb.append(now.get(Calendar.DATE));
@@ -139,23 +135,38 @@ System.out.println(outputFilename + "output???");
         return null;
     }
 
+    public static void printUsage() {
+        System.out.println("Usage: java -jar RegenerateTransactionContentSummary.jar [input filename] [(optional) output filename]");
+        System.out.println("This utility rebuilds the TransactionContentSummary in an NIEM version 4 XML file");
+        System.out.println("The filename of the XML file must be submitted as the first entry on the command-line.");
+        System.out.println("If the output filename is specified, the utlity will output that, otherwise a default filename will be used.");
+    }
+
     public static final void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
         String inputFilename = null;
         String outputFilename = null;
-        
+
         try {
             inputFilename = args[0];
         } catch (ArrayIndexOutOfBoundsException aioobe) {
-            System.out.println("No");
+            printUsage();
+            return;
+        }
+
+        if (inputFilename.equalsIgnoreCase("--help")
+                || inputFilename.equalsIgnoreCase("-help")
+                || inputFilename.equalsIgnoreCase("-?")
+                || inputFilename.equalsIgnoreCase("--?")) {
+            printUsage();
             return;
         }
 
         try {
             outputFilename = args[1];
         } catch (ArrayIndexOutOfBoundsException aioobe) {
-            
+
         }
-        
-        RegenerateTransactionContentSummary.run(inputFilename,outputFilename);
+
+        RegenerateTransactionContentSummary.run(inputFilename, outputFilename);
     }
 }

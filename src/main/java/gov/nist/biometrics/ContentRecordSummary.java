@@ -74,7 +74,7 @@ public class ContentRecordSummary {
         return false;
     }
     
-    Element toXml(Document doc) {
+    public Element toXml(Document doc) {
         
         Element crs = doc.createElementNS("http://biometrics.nist.gov/standard/2011", "ContentRecordSummary");
         Element id = doc.createElementNS("http://publication.niem.gov/niem/domains/biometrics/4.0/1/", "ImageReferenceID");
@@ -90,7 +90,7 @@ public class ContentRecordSummary {
         return crs;
     }
     
-    static ContentRecordSummary convertRecordToCRS(Element record) {
+    public static ContentRecordSummary convertRecordToCRS(Element record) {
         ContentRecordSummary crs = new ContentRecordSummary();
         
         String recordName = record.getTagName();
@@ -123,10 +123,7 @@ public class ContentRecordSummary {
                 Node id = children.item(i);
                 Element idElement = (Element) id;            
                 String idValue = idElement.getTextContent();
-                
-                System.out.println("ID = " + idValue);
-                crs.setImageReferenceID(idValue);
-                    
+                crs.setImageReferenceID(idValue);                    
             }
         }
 
