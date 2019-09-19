@@ -155,7 +155,6 @@ System.out.println(outputFilename + "output???");
         } catch (ArrayIndexOutOfBoundsException aioobe) {
             
         }
-
         
         RegenerateTransactionContentSummary.run(inputFilename,outputFilename);
     }

@@ -50,16 +50,16 @@ public class ContentRecordSummary {
         String name = node.getNodeName();
         if(name == null) return false;
         if(name.endsWith("PackageDescriptiveTextRecord") ||
-                name.endsWith("PackageHighResolutionGrayscaleImageRecord") ||
+                name.endsWith("PackageLegacyFingerprintImageRecord") ||
                 name.endsWith("PackageUserDefinedImageRecord") ||
                 name.endsWith("PackageSignatureImageRecord") ||
                 name.endsWith("PackageMinutiaeRecord") ||
-                name.endsWith("PackageFacialAndSMTImageRecord") ||
+                name.endsWith("PackagePhotographicBodyPartImageRecord") ||
                 name.endsWith("PackageVoiceDataRecord") ||
                 name.endsWith("PackageForensicDentalDataRecord") ||
                 name.endsWith("PackageLatentImageRecord") ||
-                name.endsWith("PackageFingerprintImageRecord") ||
-                name.endsWith("PackagePalmprintImageRecord") ||
+                name.endsWith("PackageFingerImpressionImageRecord") ||
+                name.endsWith("PackagePalmPrintImageRecord") ||
                 name.endsWith("PackageUserDefinedTestingImageRecord") ||
                 name.endsWith("PackageIrisImageRecord") ||
                 name.endsWith("PackageDNARecord") ||
@@ -96,17 +96,17 @@ public class ContentRecordSummary {
         String recordName = record.getTagName();
 
         if(recordName.endsWith("PackageDescriptiveTextRecord")) crs.setRecordCategoryCode("02"); else if
-            (recordName.endsWith("PackageHighResolutionGrayscaleImageRecord")) crs.setRecordCategoryCode("04"); else if
+            (recordName.endsWith("PackageLegacyFingerprintImageRecord")) crs.setRecordCategoryCode("04"); else if
             (recordName.endsWith("PackageUserDefinedImageRecord")) crs.setRecordCategoryCode("07"); else if
             (recordName.endsWith("PackageSignatureImageRecord")) crs.setRecordCategoryCode("08"); else if
             (recordName.endsWith("PackageMinutiaeRecord")) crs.setRecordCategoryCode("09"); else if
-            (recordName.endsWith("PackageFacialAndSMTImageRecord")) crs.setRecordCategoryCode("10"); else if
+            (recordName.endsWith("PackagePhotographicBodyPartImageRecord")) crs.setRecordCategoryCode("10"); else if
             (recordName.endsWith("PackageVoiceDataRecord")) crs.setRecordCategoryCode("11"); else if                                                                                
             (recordName.endsWith("PackageForensicDentalDataRecord")) crs.setRecordCategoryCode("12"); else if
             (recordName.endsWith("PackageLatentImageRecord")) crs.setRecordCategoryCode("13"); else if
-            (recordName.endsWith("PackageFingerprintImageRecord")) crs.setRecordCategoryCode("14"); else if
-            (recordName.endsWith("PackagePalmprintImageRecord")) crs.setRecordCategoryCode("15"); else if
-            (recordName.endsWith("UserDefinedTestingImageRecord")) crs.setRecordCategoryCode("16"); else if
+            (recordName.endsWith("PackageFingerImpressionImageRecord")) crs.setRecordCategoryCode("14"); else if
+            (recordName.endsWith("PackagePalmPrintImageRecord")) crs.setRecordCategoryCode("15"); else if
+            (recordName.endsWith("PackageUserDefinedTestingImageRecord")) crs.setRecordCategoryCode("16"); else if
             (recordName.endsWith("PackageIrisImageRecord")) crs.setRecordCategoryCode("17"); else if
             (recordName.endsWith("PackageDNARecord")) crs.setRecordCategoryCode("18"); else if
             (recordName.endsWith("PackagePlantarImageRecord")) crs.setRecordCategoryCode("19"); else if
