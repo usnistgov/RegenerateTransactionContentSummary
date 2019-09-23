@@ -6,6 +6,8 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +23,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  *
@@ -28,7 +31,7 @@ import org.xml.sax.SAXException;
  */
 public class RegenerateTransactionContentSummary {
 
-    public static void run(String inputFilename, String outputFilename) throws ParserConfigurationException, SAXException, IOException {
+    public static void run(String inputFilename, String outputFilename) throws ParserConfigurationException, SAXException, IOException, NIEMParsingException {
 
         //String filename = "/home/mccaffrey/biometrics/401/xml/AllFields401.xml";
         //String filename = "/home/mccaffrey/biometrics/SomeFieldsTransformed20190917.xml";
@@ -51,43 +54,49 @@ public class RegenerateTransactionContentSummary {
         // /itl:NISTBiometricInformationExchangePackage/itl:PackageInformationRecord[1]/itl:Transaction[1]/itl:TransactionContentSummary[1]
         NodeList packageChildren = nistBiometricInformationExchangePackage.getChildNodes(); //.getElementsByTagNameNS("*","TransactionContentSummary");
         Element transactionContentSummary = null;
-        for (int i = 0; i < packageChildren.getLength(); i++) {
-            if (packageChildren.item(i) instanceof Element) {
-                Element packageChild = (Element) packageChildren.item(i);
-                if (packageChild.getTagName().endsWith("PackageInformationRecord")) {
-                    NodeList pirChildren = packageChild.getChildNodes();
-                    for (int j = 0; j < pirChildren.getLength(); j++) {
-                        if (pirChildren.item(j) instanceof Element) {
-                            Element pirChild = (Element) pirChildren.item(j);
-                            if (pirChild.getTagName().endsWith("Transaction")) {
-                                NodeList transactionChildren = pirChild.getChildNodes();
-                                for (int k = 0; k < transactionChildren.getLength(); k++) {
-                                    if (transactionChildren.item(k) instanceof Element) {
-                                        Element transactionChild = (Element) transactionChildren.item(k);
-                                        if (transactionChild.getTagName().endsWith("TransactionContentSummary")) {
-                                            transactionContentSummary = transactionChild;
+        try {
+            for (int i = 0; i < packageChildren.getLength(); i++) {
+                if (packageChildren.item(i) instanceof Element) {
+                    Element packageChild = (Element) packageChildren.item(i);
+                    if (packageChild.getTagName().endsWith("PackageInformationRecord")) {
+                        NodeList pirChildren = packageChild.getChildNodes();
+                        for (int j = 0; j < pirChildren.getLength(); j++) {
+                            if (pirChildren.item(j) instanceof Element) {
+                                Element pirChild = (Element) pirChildren.item(j);
+                                if (pirChild.getTagName().endsWith("Transaction")) {
+                                    NodeList transactionChildren = pirChild.getChildNodes();
+                                    for (int k = 0; k < transactionChildren.getLength(); k++) {
+                                        if (transactionChildren.item(k) instanceof Element) {
+                                            Element transactionChild = (Element) transactionChildren.item(k);
+                                            if (transactionChild.getTagName().endsWith("TransactionContentSummary")) {
+                                                transactionContentSummary = transactionChild;
+                                            }
                                         }
                                     }
                                 }
-                            }
 
+                            }
                         }
                     }
+
                 }
-
             }
+        } catch (NullPointerException npe) {
+            throw new NIEMParsingException();
         }
-
         NodeList tcsChildren = transactionContentSummary.getChildNodes();
-        for (int i = 0; i < tcsChildren.getLength(); i++) {
-            if (tcsChildren.item(i) instanceof Element) {
-                Element tcsChild = (Element) tcsChildren.item(i);
-                if (tcsChild.getTagName().endsWith("ContentRecordSummary")) {
-                    transactionContentSummary.removeChild(tcsChild);
+        try {
+            for (int i = 0; i < tcsChildren.getLength(); i++) {
+                if (tcsChildren.item(i) instanceof Element) {
+                    Element tcsChild = (Element) tcsChildren.item(i);
+                    if (tcsChild.getTagName().endsWith("ContentRecordSummary")) {
+                        transactionContentSummary.removeChild(tcsChild);
+                    }
                 }
             }
+        } catch (NullPointerException npe) {
+            throw new NIEMParsingException();
         }
-
         for (int i = 0; i < contentRecordSummarys.size(); i++) {
 
             Element crsElement = contentRecordSummarys.get(i).toXml(doc);
@@ -99,6 +108,7 @@ public class RegenerateTransactionContentSummary {
             outputFilename = generateCurrentFilename();
         }
         FileUtils.writeStringToFile(new File(outputFilename), xmlToString(doc), Charset.defaultCharset());
+        System.out.println(outputFilename + " created successfully!");
         //   /itl:NISTBiometricInformationExchangePackage/itl:PackageInformationRecord[1]/itl:Transaction[1]/itl:TransactionContentSummary[1]
 
     }
@@ -137,12 +147,12 @@ public class RegenerateTransactionContentSummary {
 
     public static void printUsage() {
         System.out.println("Usage: java -jar RegenerateTransactionContentSummary.jar [input filename] [(optional) output filename]");
-        System.out.println("This utility rebuilds the TransactionContentSummary in an NIEM version 4 XML file");
+        System.out.println("\nThis utility rebuilds the TransactionContentSummary in an NIEM version 4 XML file");
         System.out.println("The filename of the XML file must be submitted as the first entry on the command-line.");
         System.out.println("If the output filename is specified, the utlity will output that, otherwise a default filename will be used.");
     }
 
-    public static final void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
+    public static final void main(String[] args) throws ParserConfigurationException, SAXException {
         String inputFilename = null;
         String outputFilename = null;
 
@@ -164,9 +174,22 @@ public class RegenerateTransactionContentSummary {
         try {
             outputFilename = args[1];
         } catch (ArrayIndexOutOfBoundsException aioobe) {
-
         }
 
-        RegenerateTransactionContentSummary.run(inputFilename, outputFilename);
+        try {
+            RegenerateTransactionContentSummary.run(inputFilename, outputFilename);
+        } catch (java.io.FileNotFoundException fnfe) {
+            System.out.println("ERROR: " + inputFilename + " not found.");
+            System.exit(-1);
+        } catch (IOException ioe) {
+            System.out.println("ERROR: Unable to open " + inputFilename + ".");
+            System.exit(-1);
+        } catch (SAXParseException spe) {
+            System.out.println("ERROR: Unable to parse " + inputFilename + " as XML. Please verify filetype.");
+            System.exit(-2);
+        } catch (NIEMParsingException npe) {
+            System.out.println("ERROR: Unable to find required elements in " + inputFilename + " as XML. Please verify file is complete.");
+            System.exit(-3);
+        }
     }
 }
