@@ -1,3 +1,21 @@
+/*
+
+This software re-creates the Transaction Content Summary of a NIEM4 XML file.
+
+This software was developed at the National Institute of Standards and 
+Technology by employees of the Federal Government in the course of their
+official duties. Pursuant to title 17 Section 105 of the United States Code this
+software is not subject to copyright protection and is in the public domain.
+
+NIST assumes no responsibility whatsoever for its use by other parties, and 
+makes no guarantees, expressed or implied, about its quality, reliability, or 
+any other characteristic. We would appreciate acknowledgment if the software is 
+used. This software can be redistributed and/or modified freely provided that 
+any derivative works bear some notice that they are derived from it, and any 
+modified versions bear some notice that they have been modified.
+
+*/
+
 package gov.nist.biometrics;
 
 import java.io.File;
@@ -6,8 +24,6 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,16 +41,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-/**
- *
- * @author mccaffrey
- */
 public class RegenerateTransactionContentSummary {
 
     public static void run(String inputFilename, String outputFilename) throws ParserConfigurationException, SAXException, IOException, NIEMParsingException {
 
-        //String filename = "/home/mccaffrey/biometrics/401/xml/AllFields401.xml";
-        //String filename = "/home/mccaffrey/biometrics/SomeFieldsTransformed20190917.xml";
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(new File(inputFilename));
@@ -51,8 +61,7 @@ public class RegenerateTransactionContentSummary {
             }
         }
 
-        // /itl:NISTBiometricInformationExchangePackage/itl:PackageInformationRecord[1]/itl:Transaction[1]/itl:TransactionContentSummary[1]
-        NodeList packageChildren = nistBiometricInformationExchangePackage.getChildNodes(); //.getElementsByTagNameNS("*","TransactionContentSummary");
+        NodeList packageChildren = nistBiometricInformationExchangePackage.getChildNodes();
         Element transactionContentSummary = null;
         try {
             for (int i = 0; i < packageChildren.getLength(); i++) {
@@ -98,18 +107,14 @@ public class RegenerateTransactionContentSummary {
             throw new NIEMParsingException();
         }
         for (int i = 0; i < contentRecordSummarys.size(); i++) {
-
             Element crsElement = contentRecordSummarys.get(i).toXml(doc);
             transactionContentSummary.appendChild(crsElement);
-
         }
 
         if (outputFilename == null || outputFilename.isEmpty()) {
             outputFilename = generateCurrentFilename();
         }
-        FileUtils.writeStringToFile(new File(outputFilename), xmlToString(doc), Charset.defaultCharset());
-        System.out.println(outputFilename + " created successfully!");
-        //   /itl:NISTBiometricInformationExchangePackage/itl:PackageInformationRecord[1]/itl:Transaction[1]/itl:TransactionContentSummary[1]
+        FileUtils.writeStringToFile(new File(outputFilename), xmlToString(doc), Charset.defaultCharset()); 
 
     }
 
@@ -141,6 +146,7 @@ public class RegenerateTransactionContentSummary {
             return stringWriter.getBuffer().toString();
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(-4);
         }
         return null;
     }
@@ -174,6 +180,7 @@ public class RegenerateTransactionContentSummary {
         try {
             outputFilename = args[1];
         } catch (ArrayIndexOutOfBoundsException aioobe) {
+            outputFilename = generateCurrentFilename();
         }
 
         try {
@@ -191,5 +198,6 @@ public class RegenerateTransactionContentSummary {
             System.out.println("ERROR: Unable to find required elements in " + inputFilename + " as XML. Please verify file is complete.");
             System.exit(-3);
         }
+        System.out.println(outputFilename + " created successfully!");
     }
 }
